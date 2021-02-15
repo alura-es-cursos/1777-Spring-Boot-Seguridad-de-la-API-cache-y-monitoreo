@@ -3,6 +3,7 @@ package com.alura.forum.config.security;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.alura.forum.model.Usuario;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -37,6 +40,18 @@ public class TokenService {
 				.setExpiration(Date.from(expiracion.atZone(ZoneId.systemDefault()).toInstant()))
 				.signWith(SignatureAlgorithm.HS256, secret)
 				.compact();
+	}
+
+	public Optional<Jws<Claims>> getTokenInfo(String token) {
+		try {
+			Jws<Claims> claims = Jwts.parser()
+				.setSigningKey(secret)
+				.parseClaimsJws(token);
+			
+			return Optional.of(claims);
+		} catch(Exception e) {
+			return Optional.empty();
+		}
 	}
 
 }
